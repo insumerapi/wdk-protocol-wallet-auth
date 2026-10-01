@@ -1,11 +1,3 @@
-/**
- * InsumerAPI implementation of the WDK Wallet Auth protocol.
- *
- * Wraps POST /v1/attest and POST /v1/trust. Results are ECDSA P-256 signed
- * and verifiable offline against the JWKS at
- * https://insumermodel.com/.well-known/jwks.json using any standard JWT or
- * JOSE library (or the `insumer-verify` npm package).
- */
 export default class InsumerWalletAuthProtocol extends WalletAuthProtocol {
     /**
      * @param {Object} options

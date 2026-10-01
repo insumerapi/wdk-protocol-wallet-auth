@@ -83,12 +83,12 @@
 /**
  * @typedef {Object} TrustOptions
  * @property {string} [address] - EVM address to profile. Defaults to the attached account.
- * @property {string} [solanaAddress] - Optional Solana address (adds Solana dimension).
- * @property {string} [xrplAddress] - Optional XRPL r-address (adds XRPL stablecoin checks).
- * @property {string} [bitcoinAddress] - Optional Bitcoin address (adds Bitcoin Holdings dimension).
- * @property {string} [tronAddress] - Optional Tron address (adds Tron USDT-TRC20 dimension).
- * @property {string} [stellarAddress] - Optional Stellar address (adds USDC + BENJI on Stellar to institutional_stablecoins).
- * @property {string} [suiAddress] - Optional Sui address (adds USDC on Sui to institutional_stablecoins).
+ * @property {string} [solanaAddress] - Optional Solana address (adds the 14-check solana dimension and lets the Solana rows inside institutional_stablecoins evaluate).
+ * @property {string} [xrplAddress] - Optional XRPL r-address (adds the xrpl dimension: RLUSD, USDC, OUSG; and lets the XRPL row inside institutional_stablecoins evaluate).
+ * @property {string} [bitcoinAddress] - Optional Bitcoin address (adds the bitcoin dimension: one native BTC presence check).
+ * @property {string} [tronAddress] - Optional Tron address (adds the tron dimension: USDT, USD1, WBTC).
+ * @property {string} [stellarAddress] - Optional Stellar address. Adds no dimension; lets the USDC and BENJI on Stellar rows inside institutional_stablecoins evaluate.
+ * @property {string} [suiAddress] - Optional Sui address. Adds no dimension; lets the USDC on Sui row (institutional_stablecoins) and USDY on Sui row (tokenized_treasuries) evaluate.
  * @property {boolean} [merkleProof] - If true, request Merkle proofs (costs 6 credits instead of 3).
  */
 
@@ -119,9 +119,14 @@ export class IWalletAuthProtocol {
   }
 
   /**
-   * Return a multi-dimensional trust profile for a wallet across stablecoins,
-   * governance, NFTs, and staking activity (plus optional Solana, XRPL, Bitcoin,
-   * Tron, Stellar and Sui dimensions). The profile is signed as a whole.
+   * Return a multi-dimensional trust profile for a wallet: 145 base checks across
+   * 27 chains in 9 dimensions (stablecoins, governance, nfts, staking,
+   * institutional_stablecoins, tokenized_treasuries, stablecoin_deposits,
+   * wrapped_bitcoin, names), up to 166 across 29 chains in 13 with the optional
+   * Solana, XRPL, Bitcoin and Tron addresses, which each add their own dimension.
+   * Stellar and Sui addresses add no dimension; their rows sit inside the base
+   * dimensions and carry evaluated: false until the address is supplied. Every
+   * check is a presence check. The profile is signed as a whole.
    *
    * @param {TrustOptions} [options]
    * @returns {Promise<TrustResult>}

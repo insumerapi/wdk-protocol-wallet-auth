@@ -4,7 +4,7 @@
 
 The wallet auth primitive (read → evaluate → sign) packaged for [Wallet Development Kit](https://docs.wdk.tether.io/) apps. **Pre-transaction, condition-based access.** Given a wallet and a set of on-chain conditions, it returns a cryptographically signed pass/fail (`attest`) or a multi-dimensional trust profile (`trust`). Results are ECDSA P-256 signed and verifiable offline against a public JWKS — no secrets, no identity-first, no static credentials. It composes with WDK's transaction policy engine as a signed condition, and works standalone anywhere else.
 
-Powered by [InsumerAPI](https://insumermodel.com). `attest()` covers **37 chains**: 31 EVM networks (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB, Robinhood Chain, and the rest of the major EVM set) plus Solana, XRPL, Bitcoin, Tron, Stellar, and Sui. (Bitcoin is `token_balance` on native BTC only; Tron, Stellar, and Sui are `token_balance` only.) `trust()` is a curated profile spanning the 26–28 chains where its dimensions live (see below). Works today on every WDK surface that overlaps: `wdk-wallet-evm`, `wdk-wallet-solana`, and `wdk-wallet-btc`. TON and Lightning/Spark are on the roadmap. WDK apps on those runtimes can still call `attest()` / `trust()` against any supported address the user holds.
+Powered by [InsumerAPI](https://insumermodel.com). `attest()` covers **37 chains**: 31 EVM networks (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB, Robinhood Chain, and the rest of the major EVM set) plus Solana, XRPL, Bitcoin, Tron, Stellar, and Sui. (Bitcoin is `token_balance` on native BTC only; Tron, Stellar, and Sui are `token_balance` only.) `trust()` is a curated profile spanning the 27 to 29 chains where its dimensions live (see below). Works today on every WDK surface that overlaps: `wdk-wallet-evm`, `wdk-wallet-solana`, and `wdk-wallet-btc`. TON and Lightning/Spark are on the roadmap. WDK apps on those runtimes can still call `attest()` / `trust()` against any supported address the user holds.
 
 ## Why this exists
 
@@ -131,17 +131,17 @@ Supported condition types: `token_balance`, `nft_ownership` (33 of the 37 chains
 
 ### `trust(options)` → `Promise<TrustResult>`
 
-Returns a multi-dimensional trust profile: 45 base checks across 26 chains in 5 dimensions (stablecoins, governance, NFTs, staking, institutional_stablecoins), rising to up to 50 checks across 28 chains in 9 dimensions when the optional `solanaAddress`, `xrplAddress`, `bitcoinAddress` and `tronAddress` are supplied (each adds its own dimension). `stellarAddress` and `suiAddress` add no checks: their institutional stablecoin checks are already among the 45 and are evaluated once the matching address is supplied, as are the Solana and XRPL ones. The profile is signed as a whole. Maps to [`POST /v1/trust`](https://insumermodel.com/openapi.yaml).
+Returns a multi-dimensional trust profile: 145 base checks across 27 chains in 9 dimensions (stablecoins, governance, nfts, staking, institutional_stablecoins, tokenized_treasuries, stablecoin_deposits, wrapped_bitcoin, names), rising to up to 166 checks across 29 chains in 13 dimensions when the optional `solanaAddress`, `xrplAddress`, `bitcoinAddress` and `tronAddress` are supplied (each adds its own dimension: solana 14 checks, xrpl 3, bitcoin 1, tron 3). `stellarAddress` and `suiAddress` add no dimension: their rows are already among the 145, inside institutional_stablecoins (and tokenized_treasuries for USDY on Sui), and are evaluated once the matching address is supplied; until then each stays in the signed profile with `evaluated: false`. The Solana and XRPL rows inside the base dimensions behave the same way. Every check is a presence check. `trust.conditionSetVersion` is a dated set id (currently `"2026-10"`), signed with the profile, that names the check list run: log it, never reject on it. The profile is signed as a whole. Maps to [`POST /v1/trust`](https://insumermodel.com/openapi.yaml).
 
 ```js
 const { trust, sig, kid, pqSig, pqKid } = await walletAuth.trust({
   address: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-  solanaAddress: '...',   // optional, adds Solana dimension
-  xrplAddress: '...',     // optional, adds XRPL stablecoin checks
-  bitcoinAddress: '...',  // optional, adds Bitcoin Holdings dimension
-  tronAddress: '...',     // optional, adds Tron USDT-TRC20 dimension
-  stellarAddress: '...',  // optional, adds USDC + BENJI on Stellar
-  suiAddress: '...'       // optional, adds USDC on Sui
+  solanaAddress: '...',   // optional, adds the 14-check solana dimension
+  xrplAddress: '...',     // optional, adds the xrpl dimension (RLUSD, USDC, OUSG)
+  bitcoinAddress: '...',  // optional, adds the bitcoin dimension (native BTC)
+  tronAddress: '...',     // optional, adds the tron dimension (USDT, USD1, WBTC)
+  stellarAddress: '...',  // optional, lets the Stellar rows evaluate (no new dimension)
+  suiAddress: '...'       // optional, lets the Sui rows evaluate (no new dimension)
 })
 
 // trust.id         — TRST-XXXXX profile id
