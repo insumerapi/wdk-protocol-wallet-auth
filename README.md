@@ -146,7 +146,7 @@ const { trust, sig, kid, pqSig, pqKid } = await walletAuth.trust({
 
 // trust.id         — TRST-XXXXX profile id
 // trust.dimensions: per-dimension checks (one signature covers the whole profile)
-// trust.summary    — totalChecks, totalPassed, dimensionsWithActivity
+// trust.summary    — totalChecks, totalPassed, totalFailed, totalNotEvaluated, dimensionsWithActivity, dimensionsChecked
 // pqSig / pqKid    : ML-DSA-65 post-quantum companion + its key id (insumer-trust-pq1), additive
 ```
 
