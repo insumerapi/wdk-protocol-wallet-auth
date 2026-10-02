@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.9 (2026-10-02)
+
+- Documentation only, no code changes: the README's `trust.summary` comment lists every summary field (`totalChecks`, `totalPassed`, `totalFailed`, `totalNotEvaluated`, `dimensionsWithActivity`, `dimensionsChecked`), so the npm page matches the repository.
+
 ## 0.2.8 (2026-10-01)
 
 - Trust text follows the 2026-10-01 condition-set expansion, already live on `POST /v1/trust`: 145 base checks across 27 chains in 9 dimensions (adds tokenized_treasuries, stablecoin_deposits, wrapped_bitcoin and names), up to 166 across 29 chains in 13 with the optional Solana (14-check dimension), XRPL (RLUSD, USDC, OUSG), Bitcoin and Tron (USDT, USD1, WBTC) addresses. The `TrustOptions` JSDoc no longer calls the Stellar and Sui addresses dimensions: they add none, and their rows sit inside institutional_stablecoins (and tokenized_treasuries for USDY on Sui). The `trust()` summary names all nine base dimensions, including institutional_stablecoins, which it had omitted. README documents `trust.conditionSetVersion` as the dated set id (`2026-10`) readers log and never reject on. The declarations under `types/` were regenerated from the JSDoc (`tsc`) and ship in this release.
