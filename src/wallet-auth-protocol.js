@@ -35,12 +35,13 @@
  * @property {(number|string)} [chainId]
  * @property {(number|string|bigint)} [threshold] - Minimum balance in token units. Sent to the API as a decimal string; keys minted today require the string form.
  * @property {number} [decimals] - Optional. Leave it out: the token's own decimals are always read from the chain. If sent it is only a cross-check, and a value that differs from the token's own decimals is rejected with a 400.
- * @property {string} [tokenId]
  * @property {string} [schemaId]
  * @property {string} [attester]
  * @property {string} [indexer]
  * @property {string} [template]
- * @property {string} [currency]
+ * @property {string} [currency] - XRPL trust line currency code (e.g. "RLUSD"). Required for XRPL trust line tokens. Case-sensitive: send it exactly as the issuer created it.
+ * @property {(number|string)} [taxon] - XRPL NFToken taxon filter (optional): an integer from 0 to 4294967295, as a number or its digits.
+ * @property {string} [assetCode] - Stellar trustline asset code (e.g. "USDC"): 1 to 12 letters and digits. Required for Stellar trustline tokens (contractAddress is the issuer's G-address); not used for native XLM.
  * @property {string} [selector] - evm_view_call: canonical signature of a single-address-argument view function returning bool, e.g. "hasAccess(address)". EVM chains only.
  * @property {string} [multiple] - ratio_to_amount: collateralization multiple as a decimal string.
  * @property {string} [amount] - ratio_to_amount: reference amount in token units as a decimal string.

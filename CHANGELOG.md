@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.10 (2026-10-05)
+
+- The `Condition` type gains `taxon` (XRPL NFToken taxon, an integer from 0 to 4294967295) and `assetCode` (Stellar trustline asset code, required for Stellar trustline tokens), so a typed caller can write XRPL NFT and Stellar conditions without an excess-property error. `currency` is documented: XRPL currency codes are case-sensitive and are sent exactly as given.
+- Removes `tokenId` from the `Condition` type. The API defines no such field and nothing in the module read it.
+- Types and JSDoc only. Conditions were already passed through unchanged, so runtime behaviour is the same.
+
 ## 0.2.9 (2026-10-02)
 
 - Documentation only, no code changes: the README's `trust.summary` comment lists every summary field (`totalChecks`, `totalPassed`, `totalFailed`, `totalNotEvaluated`, `dimensionsWithActivity`, `dimensionsChecked`), so the npm page matches the repository.
