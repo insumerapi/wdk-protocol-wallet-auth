@@ -22,7 +22,7 @@
 /** @typedef {import('@tetherto/wdk-wallet').IWalletAccount} IWalletAccount */
 /**
  * @typedef {Object} Condition
- * @property {"token_balance"|"nft_ownership"|"eas_attestation"|"farcaster_id"|"evm_view_call"|"ratio_to_amount"|"ratio_to_supply"|"erc8004_agent"|"erc7710_delegation"} type
+ * @property {"token_balance"|"nft_ownership"|"eas_attestation"|"farcaster_id"|"evm_view_call"|"ratio_to_amount"|"ratio_to_supply"|"erc8004_agent"|"erc7710_delegation"|"account_code"} type
  * @property {string} [contractAddress]
  * @property {(number|string)} [chainId]
  * @property {(number|string|bigint)} [threshold] - Minimum balance in token units. Sent to the API as a decimal string; keys minted today require the string form.
@@ -42,6 +42,8 @@
  * @property {string} [delegationManager] - erc7710_delegation (Base only): recognized MetaMask Delegation Framework manager address.
  * @property {string} [expectedDelegator] - erc7710_delegation: the principal the caller asserts. Required; the condition fails unless the delegation's delegator matches.
  * @property {Object} [delegation] - erc7710_delegation: the signed delegation ({delegator, delegate, authority, caveats, salt, signature}). Met iff the wallet is the delegate, the signature verifies (EOA or ERC-1271), unrevoked at the anchored block, all caveat enforcers recognized, time windows satisfied. Limits are reported as declaredLimits, not simulated; these attestations expire in 5 minutes.
+ * @property {"none"|"eip7702"|"contract"} [expect] - account_code (EVM chainId only, no contractAddress): the code state the wallet address itself must be in at the anchored block. Required for account_code. "none" = no code (a plain key account); "eip7702" = the EIP-7702 delegation designator (a key that has delegated execution to a contract); "contract" = any other code (a smart-contract wallet, a protocol, a token). Exclusive on a chain. The result is the boolean met; the code and the delegation target are never returned.
+ * @property {string} [delegate] - account_code with expect "eip7702" only (a 400 with any other expect): an EVM address; met iff the designator points at it. Echoed, lowercase, inside the signed evaluatedCondition.
  * @property {string} [label]
  */
 /**
@@ -104,14 +106,19 @@ export class IWalletAuthProtocol {
      */
     attest(options: AttestOptions): Promise<AttestResult>;
     /**
-     * Return a multi-dimensional trust profile for a wallet: 145 base checks across
-     * 27 chains in 9 dimensions (stablecoins, governance, nfts, staking,
+     * Return a multi-dimensional trust profile for a wallet: 155 base checks across
+     * 27 chains in 10 dimensions (stablecoins, governance, nfts, staking,
      * institutional_stablecoins, tokenized_treasuries, stablecoin_deposits,
-     * wrapped_bitcoin, names), up to 166 across 29 chains in 13 with the optional
-     * Solana, XRPL, Bitcoin and Tron addresses, which each add their own dimension.
-     * Stellar and Sui addresses add no dimension; their rows sit inside the base
-     * dimensions and carry evaluated: false until the address is supplied. Every
-     * check is a presence check. The profile is signed as a whole.
+     * wrapped_bitcoin, names, account), up to 176 across 29 chains in 14 with the
+     * optional Solana, XRPL, Bitcoin and Tron addresses, which each add their own
+     * dimension. Stellar and Sui addresses add no dimension; their rows sit inside
+     * the base dimensions and carry evaluated: false until the address is supplied.
+     * Every check is a presence check; the account dimension reports whether
+     * contract code or an EIP-7702 delegation is present at the address on
+     * Ethereum, Base, Arbitrum, Optimism and Polygon. Dimensions come back in a
+     * fixed order: the base ten, then solana, xrpl, bitcoin, tron when switched on.
+     * trust.conditionSetVersion names the check list run (currently "2026-10-08").
+     * The profile is signed as a whole.
      *
      * @param {TrustOptions} [options]
      * @returns {Promise<TrustResult>}
@@ -150,7 +157,7 @@ export default class WalletAuthProtocol implements IWalletAuthProtocol {
 export type IWalletAccountReadOnly = any;
 export type IWalletAccount = any;
 export type Condition = {
-    type: "token_balance" | "nft_ownership" | "eas_attestation" | "farcaster_id" | "evm_view_call" | "ratio_to_amount" | "ratio_to_supply" | "erc8004_agent" | "erc7710_delegation";
+    type: "token_balance" | "nft_ownership" | "eas_attestation" | "farcaster_id" | "evm_view_call" | "ratio_to_amount" | "ratio_to_supply" | "erc8004_agent" | "erc7710_delegation" | "account_code";
     contractAddress?: string | undefined;
     chainId?: string | number | undefined;
     /**
@@ -209,6 +216,14 @@ export type Condition = {
      * - erc7710_delegation: the signed delegation ({delegator, delegate, authority, caveats, salt, signature}). Met iff the wallet is the delegate, the signature verifies (EOA or ERC-1271), unrevoked at the anchored block, all caveat enforcers recognized, time windows satisfied. Limits are reported as declaredLimits, not simulated; these attestations expire in 5 minutes.
      */
     delegation?: Object | undefined;
+    /**
+     * - account_code (EVM chainId only, no contractAddress): the code state the wallet address itself must be in at the anchored block. Required for account_code. "none" = no code (a plain key account); "eip7702" = the EIP-7702 delegation designator (a key that has delegated execution to a contract); "contract" = any other code (a smart-contract wallet, a protocol, a token). Exclusive on a chain. The result is the boolean met; the code and the delegation target are never returned.
+     */
+    expect?: "none" | "eip7702" | "contract" | undefined;
+    /**
+     * - account_code with expect "eip7702" only (a 400 with any other expect): an EVM address; met iff the designator points at it. Echoed, lowercase, inside the signed evaluatedCondition.
+     */
+    delegate?: string | undefined;
     label?: string | undefined;
 };
 export type AttestOptions = {

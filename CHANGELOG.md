@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 (2026-10-07)
+
+- Adds `account_code` to `Condition.type`, the tenth condition type on `POST /v1/attest`: `{ type: 'account_code', chainId: <EVM id>, expect: 'none' | 'eip7702' | 'contract' }` checks the code state of the wallet address itself at the anchored block (a plain key account, the EIP-7702 delegation designator, or any other code). The `Condition` type gains `expect` and, for `expect: 'eip7702'` only, an optional `delegate` address that is met only when the designator points at it. The result is the boolean `met`; the code and the delegation target are never returned. EVM chains only.
+- Adds the `account` dimension to the `trust()` documentation, already live on `POST /v1/trust`: two rows per chain, "Contract code on X" and "EIP-7702 delegation on X", on Ethereum, Base, Arbitrum, Optimism and Polygon. Counts move to 155 base checks across 27 chains in 10 dimensions, up to 176 across 29 chains in 14 with the optional Solana, XRPL, Bitcoin and Tron addresses; `trust.conditionSetVersion` is `2026-10-08`. Dimensions come back in a fixed order (the base ten, then solana, xrpl, bitcoin, tron when switched on). The declarations under `types/` were regenerated from the JSDoc (`tsc --allowJs --declaration --emitDeclarationOnly --strict`) and ship in this release.
+- Types and JSDoc only. Conditions were already passed through unchanged, so runtime behaviour is the same.
+
 ## 0.2.10 (2026-10-05)
 
 - The `Condition` type gains `taxon` (XRPL NFToken taxon, an integer from 0 to 4294967295) and `assetCode` (Stellar trustline asset code, required for Stellar trustline tokens), so a typed caller can write XRPL NFT and Stellar conditions without an excess-property error. `currency` is documented: XRPL currency codes are case-sensitive and are sent exactly as given.
