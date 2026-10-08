@@ -122,7 +122,7 @@ const result = await walletAuth.attest({
 // result.passed           — true only if every condition is met
 // result.attestation      — full attestation object (per-condition results, block info, condition hash)
 // result.sig / result.kid — ECDSA P-256 signature + key id (verify against JWKS)
-// result.pqSig / pqKid    — ML-DSA-65 post-quantum companion + its key id (additive)
+// result.pqSig / pqKid    : ML-DSA-65 post-quantum signature + its key id (additive)
 // result.jwt / pqJwt      — ES256 JWT form and its post-quantum sibling, when requested
 // result.creditsRemaining — credits remaining on the API key
 ```
@@ -147,12 +147,12 @@ const { trust, sig, kid, pqSig, pqKid } = await walletAuth.trust({
 // trust.id         : TRST-XXXXX profile id
 // trust.dimensions: per-dimension checks (one signature covers the whole profile)
 // trust.summary    : totalChecks (155 here, 176 with every optional address), totalPassed, totalFailed, totalNotEvaluated, dimensionsWithActivity, dimensionsChecked (10 here, 14 with every optional address)
-// pqSig / pqKid    : ML-DSA-65 post-quantum companion + its key id (insumer-trust-pq1), additive
+// pqSig / pqKid    : ML-DSA-65 post-quantum signature + its key id (insumer-trust-pq1), additive
 ```
 
 ## Verification
 
-Every attestation and trust result is ECDSA P-256 signed, and since September 2026 also carries an ML-DSA-65 post-quantum companion (`pqSig`, `pqKid`; `pqJwt` beside `jwt`). The signature (`sig`) and key id (`kid`) let any party verify the result offline, without calling the API, using the public JWKS, which holds the EC key under three kids and the post-quantum key under two RFC 9964 `AKP` entries; `insumer-verify` 1.8.1+ reports the companion as a fifth verdict:
+Every attestation and trust result is signed twice: ES256 and a post-quantum ML-DSA-65 signature (`pqSig`, `pqKid`; `pqJwt` beside `jwt`). The signature (`sig`) and key id (`kid`) let any party verify the result offline, without calling the API, using the public JWKS, which holds the EC key under three kids and the post-quantum key under two RFC 9964 `AKP` entries; `insumer-verify` 1.8.1+ reports the post-quantum signature as a fifth verdict:
 
 ```
 https://insumermodel.com/.well-known/jwks.json

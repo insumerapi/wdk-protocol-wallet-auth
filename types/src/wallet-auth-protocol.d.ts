@@ -66,9 +66,9 @@
  * @property {string} sig - ECDSA P-256 signature over the attestation (base64).
  * @property {string} kid - Key ID identifying the signing key in the JWKS; it also selects the signed preimage (insumer-attest-v1 or insumer-attest-v2).
  * @property {string} [jwt] - ES256 JWT form of the attestation, when requested.
- * @property {string} [pqSig] - Post-quantum companion signature (ML-DSA-65, FIPS 204) over the same preimage under a post-quantum domain tag. Additive beside sig.
- * @property {string} [pqKid] - Key ID of the companion in the JWKS (insumer-attest-pq1, an RFC 9964 AKP entry).
- * @property {string} [pqJwt] - Post-quantum companion of jwt (compact JWS, alg ML-DSA-65), when jwt was requested.
+ * @property {string} [pqSig] - Post-quantum signature (ML-DSA-65, FIPS 204) over the same preimage under a post-quantum domain tag. Additive beside sig.
+ * @property {string} [pqKid] - Key ID of the post-quantum key in the JWKS (insumer-attest-pq1, an RFC 9964 AKP entry).
+ * @property {string} [pqJwt] - Post-quantum form of jwt (compact JWS, alg ML-DSA-65), when jwt was requested.
  * @property {number} creditsRemaining - Credits remaining on the API key after this call.
  * @property {number} creditsCharged - Credits consumed by this call.
  */
@@ -88,8 +88,8 @@
  * @property {Object} trust - Full trust profile (dimensions, checks, summary, profile id).
  * @property {string} sig - ECDSA P-256 signature over the trust object.
  * @property {string} kid - Key ID identifying the signing key in the JWKS.
- * @property {string} [pqSig] - Post-quantum companion signature (ML-DSA-65) over the trust preimage under a post-quantum domain tag.
- * @property {string} [pqKid] - Key ID of the companion in the JWKS (insumer-trust-pq1).
+ * @property {string} [pqSig] - Post-quantum signature (ML-DSA-65) over the trust preimage under a post-quantum domain tag.
+ * @property {string} [pqKid] - Key ID of the post-quantum key in the JWKS (insumer-trust-pq1).
  * @property {number} creditsRemaining
  * @property {number} creditsCharged
  */
@@ -290,15 +290,15 @@ export type AttestResult = {
      */
     jwt?: string | undefined;
     /**
-     * - Post-quantum companion signature (ML-DSA-65, FIPS 204) over the same preimage under a post-quantum domain tag. Additive beside sig.
+     * - Post-quantum signature (ML-DSA-65, FIPS 204) over the same preimage under a post-quantum domain tag. Additive beside sig.
      */
     pqSig?: string | undefined;
     /**
-     * - Key ID of the companion in the JWKS (insumer-attest-pq1, an RFC 9964 AKP entry).
+     * - Key ID of the post-quantum key in the JWKS (insumer-attest-pq1, an RFC 9964 AKP entry).
      */
     pqKid?: string | undefined;
     /**
-     * - Post-quantum companion of jwt (compact JWS, alg ML-DSA-65), when jwt was requested.
+     * - Post-quantum form of jwt (compact JWS, alg ML-DSA-65), when jwt was requested.
      */
     pqJwt?: string | undefined;
     /**
@@ -358,11 +358,11 @@ export type TrustResult = {
      */
     kid: string;
     /**
-     * - Post-quantum companion signature (ML-DSA-65) over the trust preimage under a post-quantum domain tag.
+     * - Post-quantum signature (ML-DSA-65) over the trust preimage under a post-quantum domain tag.
      */
     pqSig?: string | undefined;
     /**
-     * - Key ID of the companion in the JWKS (insumer-trust-pq1).
+     * - Key ID of the post-quantum key in the JWKS (insumer-trust-pq1).
      */
     pqKid?: string | undefined;
     creditsRemaining: number;
