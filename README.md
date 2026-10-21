@@ -75,9 +75,13 @@ Two ways to provision an API key. Either flow ships **10 free attestation credit
 - **Email signup** (human-managed wallet apps): `POST /v1/keys/create` with `{ email, appName, tier: "free" }`, or use the form at [insumermodel.com](https://insumermodel.com). No credit card.
 - **On-chain** (autonomous agent operating its own WDK wallet): send USDC to the platform wallet, then `POST /v1/keys/buy` with the transaction hash and `senderSignature`, the paying wallet's signature over a short text naming the payment (a call without it returns the exact text). The wallet that paid is the identity. No email, no human in the loop.
 
+Set the resulting key as `INSUMER_API_KEY` in your runtime.
+
+### Topping up credits
+
 Top up an existing key on-chain via `POST /v1/credits/buy`: no Stripe, no fiat. Purchases are paid in USDC only, on Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB Chain or Solana. USDT, Bitcoin and Tron are not accepted.
 
-Send the USDC to the platform wallet for your chosen chain, then `POST /v1/credits/buy` with `{ txHash, chainId, amount }`. A first top-up, or one that changes the registered wallet, also carries `senderSignature` from the wallet that paid. Credits post as soon as the transaction is verified on-chain. h, chainId, amount }`. Credits post as soon as the transaction is verified on-chain. See the [OpenAPI spec](https://insumermodel.com/openapi.yaml) for the full request shape.
+Send the USDC to the platform wallet for your chosen chain, then `POST /v1/credits/buy` with `{ txHash, chainId, amount }`. A first top-up, or one that changes the registered wallet, also carries `senderSignature` from the wallet that paid. Credits post as soon as the transaction is verified on-chain. See the [OpenAPI spec](https://insumermodel.com/openapi.yaml) for the full request shape.
 
 ## API
 
