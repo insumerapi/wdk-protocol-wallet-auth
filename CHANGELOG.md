@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 (2026-10-21)
+
+- README: on-chain key purchases and top-ups are USDC only (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB Chain, Solana), and the paying wallet signs a short text naming the payment (`senderSignature`). USDT, Bitcoin and Tron are no longer accepted for purchases.
+- Ships the documentation changes made since 0.3.0: the post-quantum signature named as such (signed twice: ES256 and ML-DSA-65) in the README and type comments, version and license badges, plain punctuation. No code changes.
+
 ## 0.3.0 (2026-10-07)
 
 - Adds `account_code` to `Condition.type`, the tenth condition type on `POST /v1/attest`: `{ type: 'account_code', chainId: <EVM id>, expect: 'none' | 'eip7702' | 'contract' }` checks the code state of the wallet address itself at the anchored block (a plain key account, the EIP-7702 delegation designator, or any other code). The `Condition` type gains `expect` and, for `expect: 'eip7702'` only, an optional `delegate` address that is met only when the designator points at it. The result is the boolean `met`; the code and the delegation target are never returned. EVM chains only.
