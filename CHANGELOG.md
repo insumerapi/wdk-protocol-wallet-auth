@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2 (2026-11-11)
+
+- Package description in plain punctuation. Adds the `tether`, `ai-agents` and `insumer` keywords. Package metadata only: no code changes.
+
 ## 0.3.1 (2026-10-21)
 
 - README: on-chain key purchases and top-ups are USDC only (Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, BNB Chain, Solana), and the paying wallet signs a short text naming the payment (`senderSignature`). USDT, Bitcoin and Tron are no longer accepted for purchases.
