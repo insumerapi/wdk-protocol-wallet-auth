@@ -10,16 +10,23 @@ Powered by [InsumerAPI](https://insumermodel.com). `attest()` covers **37 chains
 
 ## Why this exists
 
-WDK shipped a local transaction **policy engine** in beta.11 (`wdk.registerPolicy(...)`), the enforcement layer that gates write-facing operations *before* a wallet signs. A policy rule's `ALLOW`/`DENY` decision runs a **condition**: a function that answers "should this operation proceed?" The engine deliberately leaves that function to you.
+WDK has a local transaction **policy engine**, the layer that checks write-facing operations *before* a wallet signs. It shipped inside `@tetherto/wdk` in beta.11 and has been its own opt-in package, [`@tetherto/wdk-policies`](https://github.com/tetherto/wdk-policies), since `@tetherto/wdk` `1.0.0-beta.23`. A policy rule's `ALLOW`/`DENY` decision runs a **condition**: a function that answers "should this operation proceed?" The engine deliberately leaves that function to you.
 
-This package *is* that condition. `attest()` is an async, on-chain, cryptographically signed check you drop straight into a policy rule, so apps don't hand-roll balance / NFT / staking reads per policy. The engine is **default-deny on governed accounts**, so the idiomatic shape is an `ALLOW` gated on the check passing (which is also fail-closed for free: if the call throws, the `ALLOW` simply doesn't match and the op is denied). This snippet targets WDK `1.0.0-beta.16` and later, where conditions receive the call's arguments as `args`:
+This package *is* that condition. `attest()` is an async, on-chain, cryptographically signed check you drop straight into a policy rule, so apps don't hand-roll balance / NFT / staking reads per policy. The engine is **default-deny on governed accounts**, so the idiomatic shape is an `ALLOW` gated on the check passing (which is also fail-closed for free: if the call throws, the `ALLOW` simply doesn't match and the op is denied). This snippet targets `@tetherto/wdk` `1.0.0-beta.23` and later with `@tetherto/wdk-policies`. On `1.0.0-beta.16` to `1.0.0-beta.22` the engine is part of core: call `wdk.registerPolicy({...})` with the same policy object.
 
 ```js
+import WDK from '@tetherto/wdk'
+import WdkPolicies from '@tetherto/wdk-policies'
+import WalletManagerEvm from '@tetherto/wdk-wallet-evm'
 import WalletAuth from '@insumermodel/wdk-protocol-wallet-auth'
 
 const walletAuth = new WalletAuth({ apiKey: process.env.INSUMER_API_KEY })
 
-wdk.registerPolicy({
+const wdk = new WDK(seedPhrase)
+  .registerWallet('ethereum', WalletManagerEvm, { provider: rpcUrl })
+
+// Policies are opt-in: attach the plugin to the wallet, then register.
+new WdkPolicies().attach(wdk, 'ethereum').register({
   id: 'counterparty-trust',
   name: 'Counterparty must pass wallet auth',
   scope: 'project',
@@ -37,6 +44,8 @@ wdk.registerPolicy({
   }]
 })
 ```
+
+Tether describes the engine as a guardrail against mistakes in your own code, not a security boundary: it runs in your process. The signed result is the part anyone can check afterwards.
 
 It also works **standalone**, with or without WDK: call `attest()` / `trust()` directly before broadcasting:
 

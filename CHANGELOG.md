@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3 (2026-11-14)
+
+- README: the policy example follows WDK's move of the transaction policy engine out of core. From `@tetherto/wdk` `1.0.0-beta.23` the engine is the opt-in package `@tetherto/wdk-policies`, so the example attaches `WdkPolicies` to the wallet and registers the policy through it. On `1.0.0-beta.16` to `1.0.0-beta.22`, `wdk.registerPolicy({...})` takes the same policy object. Documentation only: no code changes.
+
 ## 0.3.2 (2026-11-11)
 
 - Package description in plain punctuation. Adds the `tether`, `ai-agents` and `insumer` keywords. Package metadata only: no code changes.
